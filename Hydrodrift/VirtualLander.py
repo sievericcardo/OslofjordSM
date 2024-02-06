@@ -101,6 +101,12 @@ class VirtualLander():
         
         
     def smoother(self):
+        '''
+        Smoothing method for the lander values.
+        The Change-value will not be changed, but rather fill in the default values with estimated values.
+        (Only if its logical)
+        
+        '''
         for i in range(self.seed_length):
             if i == 0 or self.arr_change[i] == True or self.arr_change[i-1] == False:
                 continue
