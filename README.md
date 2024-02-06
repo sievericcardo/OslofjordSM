@@ -37,20 +37,21 @@ pip install --no-deps -e .
  
 # To run in conda
 
-1. First create a nc file with sensor data for the driftmodel
+1. First create the API netCDF file with sensor data for the driftmodel
 ```
-python cdf.py
+python api_to_nc.py
 ```
 
 2. Run the drift simulator
 ```
-python SalinityDrift.py
+python HydroDrift.py
 ```
 
-3. Read the output by running
-```
-python cdf_reader.py
-```
+The result:
+- Outputfile with particle properties
+- Visual simulation
+- Print Virtual Lander data
+
 
 
 
