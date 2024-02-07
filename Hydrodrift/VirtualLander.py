@@ -1,4 +1,5 @@
 import numpy as np
+from datetime import datetime, timedelta 
 
 class VirtualLander():
     '''
@@ -13,11 +14,13 @@ class VirtualLander():
     
     df_salinity = 20
     df_temperature = 8
+
     arr_salinity = []
     arr_temperature = []
-
+    arr_datetime = []
     arr_change = []
 
+    change = False
     starttime = None
     id= 0
     seed_length = 0
@@ -51,6 +54,11 @@ class VirtualLander():
         self.arr_salinity = np.full(seed_length, self.df_salinity, dtype=np.float32)
         self.arr_temperature = np.full(seed_length, self.df_temperature, dtype=np.float32)
         self.arr_change = np.full(seed_length, False)
+        print(starttime)
+        self.arr_datetime = np.full(seed_length, (starttime))
+
+        for i in range(seed_length):
+            self.arr_datetime[i] =  (starttime) + timedelta(hours=i)
 
         print(f"Lander {self.id} is created")
 
@@ -68,6 +76,8 @@ class VirtualLander():
         
 
         duration = int(time_difference.total_seconds() / 3600)
+
+        self.change = True
         
         if self.arr_change[duration] == False:
             self.arr_salinity[duration] = sim_salinity
@@ -108,11 +118,11 @@ class VirtualLander():
         
         '''
         for i in range(self.seed_length):
-            if i == 0 or self.arr_change[i] == True or self.arr_change[i-1] == False:
+            if i == 0 or self.arr_change[i] == True: #må endre or self.arr_change[i-1] == False
                 continue
                 #skip
             
-            elif self.arr_change[i] == False and self.arr_change[i-1] == True:
+            elif self.arr_change[i] == False  and (self.arr_change[i-1] == True or (self.arr_salinity[i-1] != self.df_salinity and self.arr_temperature[i-1] != self.df_temperature)):
                     next_changed_index = i+1
 
                     while next_changed_index < self.seed_length:
@@ -123,9 +133,14 @@ class VirtualLander():
                         
                         next_changed_index= next_changed_index+1
 
+                    if self.arr_salinity[i] == self.df_salinity and self.arr_temperature[i] == self.df_temperature:
+                        self.arr_salinity[i] = np.float32(self.arr_salinity[i-1])
+                        self.arr_temperature[i] = np.float32(self.arr_temperature[i-1])
+
         
     def print_lander(self):      
         print(f"Lander {self.id} has location {self.lat} {self.lon}")
+        #print(f"Datetime: {self.arr_datetime}")
         print(f"Salinity: {self.arr_salinity}")
         print(f"Temperature: {self.arr_temperature} ")
         print(f"Status of update {self.arr_change} ")

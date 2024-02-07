@@ -21,8 +21,10 @@ class HydroDrift(OceanDrift):
 
     # Setting up the required variables for the run
     required_variables = {
-        'sea_water_salinity': {'fallback': 20.0},
-         'x_sea_water_velocity': {
+        'sea_water_salinity': {
+            'fallback': 20.0
+        },
+        'x_sea_water_velocity': {
             'fallback': None
         },
         'y_sea_water_velocity': {
@@ -189,6 +191,36 @@ class HydroDrift(OceanDrift):
             seed_length
 
         '''
+
+        # Predefined area
+        min_location = [59.652879, 10.489808]
+        max_location = [59.917570, 10.770731]
+
+        location_lat_list=[]
+        location_lon_list=[]
+
+        size_lat = 0.02
+        size_lon = 0.02
+
+        curr_lat = min_location[0]
+        while curr_lat < max_location[0]:
+            location_lat_list.append(curr_lat)
+            curr_lat + size_lat
+        
+        location_lat_list.append(curr_lat)
+
+        curr_lon = min_location[1]
+        while curr_lon < max_location[1]:
+            location_lat_list.append(curr_lat)
+            curr_lat + size_lon
+        
+        location_lat_list.append(curr_lat)
+
+        #location_lon_list = 
+
+
+
+
         location_lat_list = [59.658233, 59.683, 60.000, 59.847925]
         location_lon_list = [10.624583, 10.603, 10.603, 10.614980]
 
