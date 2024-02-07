@@ -10,7 +10,7 @@ class VirtualLander():
     - Salinity
     - Temperature
     '''
-    maxlat, minlat, maxlon, minlon, lat, lon = 0, 0, 0, 0, 0, 0
+    maxlat, minlat, maxlon, minlon, center_lat, center_lon = 0, 0, 0, 0, 0, 0
     
     df_salinity = 20
     df_temperature = 8
@@ -30,7 +30,7 @@ class VirtualLander():
        
 
 
-    def create_lander(self, lat, lon, starttime, seed_length):
+    def create_lander(self, min_lat, max_lat, min_lon, max_lon, starttime, seed_length):
         '''
         Method to create a single lander
         Required variables:
@@ -39,17 +39,16 @@ class VirtualLander():
             starttime
         '''
         # Variable for the size of per grid
-        grid_size = 0.02
 
-        self.lat = lat
-        self.lon = lon
         self.starttime = starttime
         self.seed_length = seed_length
 
-        self.maxlat = lat + grid_size
-        self.minlat = lat - grid_size
-        self.maxlon = lon + grid_size
-        self.minlon = lon - grid_size
+        self.maxlat = max_lat
+        self.minlat = min_lat
+        self.maxlon = max_lon
+        self.minlon = min_lon
+
+        self.calculate_center(max_lat, min_lat, max_lon, min_lon)
 
         self.arr_salinity = np.full(seed_length, self.df_salinity, dtype=np.float32)
         self.arr_temperature = np.full(seed_length, self.df_temperature, dtype=np.float32)
@@ -108,7 +107,7 @@ class VirtualLander():
             return False
         else:
             return True
-        
+    
         
     def smoother(self):
         '''
@@ -137,9 +136,13 @@ class VirtualLander():
                         self.arr_salinity[i] = np.float32(self.arr_salinity[i-1])
                         self.arr_temperature[i] = np.float32(self.arr_temperature[i-1])
 
+    def calculate_center(self, max_lat, min_lat, max_lon, min_lon):
+        self.center_lat = (max_lat + min_lat) / 2
+        self.center_lon = (max_lon + min_lon) / 2
+        
         
     def print_lander(self):      
-        print(f"Lander {self.id} has location {self.lat} {self.lon}")
+        print(f"Lander {self.id} has location {self.center_lat} {self.center_lon}")
         #print(f"Datetime: {self.arr_datetime}")
         print(f"Salinity: {self.arr_salinity}")
         print(f"Temperature: {self.arr_temperature} ")

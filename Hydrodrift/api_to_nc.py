@@ -8,13 +8,14 @@ import cftime
 hasura_url = "http://localhost:8080/v1/graphql"
 headers = {
     "Content-Type": "application/json",
-    # Add any additional headers or authentication tokens if required
+    "x-hasura-admin-secret": "mylongsecretkey"
+   
 }
 
 # Your specific GraphQL query
 graphql_query = """
 query Salinity {
-    salinity(limit: 200) { 
+    salinity (limit: 10) { 
       record_time
       temperature
       conductivity
@@ -26,6 +27,7 @@ query Salinity {
 try:
     # Make a POST request to the Hasura GraphQL endpoint
     response = requests.post(hasura_url, json={"query": graphql_query}, headers=headers)
+
 
     # Check if the request was successful (status code 200)
     if response.status_code == 200:

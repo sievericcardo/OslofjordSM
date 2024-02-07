@@ -183,12 +183,14 @@ class HydroDrift(OceanDrift):
     
     
  
-    def create_landers_from_list(self, starttime, seed_length):
+    def create_landers_from_list(self, starttime, seed_length, size_lat, size_lon):
         '''
         Method to create landers from a predefined list.
         Required variables:
             starttime
             seed_length
+            size_lat
+            size_lon
 
         '''
 
@@ -199,35 +201,42 @@ class HydroDrift(OceanDrift):
         location_lat_list=[]
         location_lon_list=[]
 
-        size_lat = 0.02
-        size_lon = 0.02
 
         curr_lat = min_location[0]
         while curr_lat < max_location[0]:
             location_lat_list.append(curr_lat)
-            curr_lat + size_lat
+            curr_lat += size_lat
         
         location_lat_list.append(curr_lat)
 
         curr_lon = min_location[1]
         while curr_lon < max_location[1]:
-            location_lat_list.append(curr_lat)
-            curr_lat + size_lon
+            location_lon_list.append(curr_lon)
+            curr_lon += size_lon
         
-        location_lat_list.append(curr_lat)
+        location_lon_list.append(curr_lon)
 
-        #location_lon_list = 
+        id = 0
+
+        for lat in range(len(location_lat_list)):
+            for lon in range(len(location_lon_list)):
+
+                if not (lat == len(location_lat_list)-1 or lon == len(location_lon_list)-1):
+                    lander = VirtualLander(id)
+                    lander.create_lander(location_lat_list[lat], location_lat_list[lat+1], location_lon_list[lon], location_lon_list[lon+1], starttime, seed_length) 
+                    self.lander_list.append(lander)
+                    id+=1
 
 
 
 
-        location_lat_list = [59.658233, 59.683, 60.000, 59.847925]
-        location_lon_list = [10.624583, 10.603, 10.603, 10.614980]
+        #location_lat_list = [59.658233, 59.683, 60.000, 59.847925]
+        #location_lon_list = [10.624583, 10.603, 10.603, 10.614980]
 
-        for ind in range(len(location_lat_list)):
-            lander = VirtualLander(ind)
-            lander.create_lander(location_lat_list[ind], location_lon_list[ind], starttime, seed_length) 
-            self.lander_list.append(lander)
+        # for ind in range(len(location_lat_list)):
+        #    lander = VirtualLander(ind)
+        #    lander.create_lander(location_lat_list[ind], location_lon_list[ind], starttime, seed_length) 
+        #    self.lander_list.append(lander)
 
 
     def update_lander(self):
@@ -285,23 +294,27 @@ if __name__ == "__main__":
     
     number = 1
     o.seed_elements(lon=lon, lat=lat, time=[t1, t2],
-                    number=100, radius=200, z=-40)
+                    number=200, radius=200, z=-40)
 
     seed_times = o.elements_scheduled_time[0:number]
 
     # Remember time:units = "seconds since 1970-01-01 00:00:00" ;
-    o.create_landers_from_list(t1,seed_length)
+    size_lat = 0.02
+    size_lon = 0.02
+    o.create_landers_from_list(t1,seed_length, size_lat, size_lon)
 
-    for lander in o.lander_list:
-        lander.print_lander()
 
     # 30 min interval in 188 hours until all particles deactivate or timeout
     o.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
   
     print("---------------------------------------------------------------------------------")
     for lander in o.lander_list:
-        lander.smoother()
-        lander.print_lander()
+        if lander.change == True:
+            lander.smoother()
+            lander.print_lander()
+            #o.seed_elements(lon=lander.center_lon, lat=lander.center_lat, time=t1, number=100000)
+
+    
 
     #o.write_netcdf_density_map('output_filename.nc')
     o.animation(fast=True, filename='hydrodrift_sim_vis.mp4')
