@@ -5,7 +5,7 @@ import numpy as np
 
 class HydroParticle(LagrangianArray):
     '''
-    Base variables:
+    Base variables: 
         ID
         status
         moving
@@ -25,6 +25,11 @@ class HydroParticle(LagrangianArray):
         ('temperature', {'dtype': np.float32,
                          'units': 'Celsius',
                          'default': 25.0}),
+
+        ('turbidity', {'dtype': np.float32,
+                         'units': 'NTU',
+                         'default': 25.0}),
+
 
         ('current_drift_factor', {'dtype': np.float32,
                                   'units': '',

@@ -14,12 +14,15 @@ headers = {
 
 # Your specific GraphQL query
 graphql_query = """
-query Salinity {
-    salinity (limit: 10) { 
-      record_time
-      temperature
-      conductivity
-      location
+query APIQuery {
+    salinity (limit: 500) { 
+        record_time
+        temperature
+        conductivity
+        location
+    }
+    turbidity (limit: 500) {
+        turbidity
     }
   }
 """
@@ -33,7 +36,8 @@ try:
     if response.status_code == 200:
         # Parse the GraphQL response
         graphql_data = response.json()["data"]["salinity"]
-        if graphql_data:
+        turbidity_data = response.json()["data"]["turbidity"]
+        if graphql_data and turbidity_data:
             print("Response successful")
 
         # Extract relevant data from GraphQL response
@@ -56,18 +60,22 @@ try:
         lat = np.linspace(min_lat, max_lat, num_points_lat)
         lon = np.linspace(min_lon, max_lon, num_points_lon)
 
-        # Extract sea water salinity and temperature data from the API
+        # Extract sea water salinity, temperature and tubidity data from the API
         sea_water_salinity_data = np.array([entry["conductivity"] for entry in graphql_data])
         sea_water_temperature_data = np.array([entry["temperature"] for entry in graphql_data])
+        sea_water_turbidity_data = np.array([entry["turbidity"] for entry in turbidity_data])
+       
 
         # Make sure the data is finite, otherwise set to 0.0
         is_finite_salinity = np.isfinite(sea_water_salinity_data)
         is_finite_temperature = np.isfinite(sea_water_temperature_data)
+        is_finite_turbidity = np.isfinite(sea_water_turbidity_data)
 
         sea_water_salinity_data[~is_finite_salinity] = 0.0
         sea_water_temperature_data[~is_finite_temperature] = 0.0
+        sea_water_turbidity_data[~is_finite_turbidity] = 0.0
 
-        # Repeat the salinity and temperature data along the depth, lat, and lon dimensions
+        # Repeat the salinity, temperature and tubidity data along the depth, lat, and lon dimensions
         sea_water_salinity = np.repeat(sea_water_salinity_data[:, np.newaxis, np.newaxis, np.newaxis], len(depth), axis=1)
         sea_water_salinity = np.repeat(sea_water_salinity, len(lat), axis=2)
         sea_water_salinity = np.repeat(sea_water_salinity, len(lon), axis=3)
@@ -76,13 +84,20 @@ try:
         sea_water_temperature = np.repeat(sea_water_temperature, len(lat), axis=2)
         sea_water_temperature = np.repeat(sea_water_temperature, len(lon), axis=3)
 
+        sea_water_turbidity = np.repeat(sea_water_turbidity_data[:, np.newaxis, np.newaxis, np.newaxis], len(depth), axis=1)
+        sea_water_turbidity = np.repeat(sea_water_turbidity, len(lat), axis=2)
+        sea_water_turbidity = np.repeat(sea_water_turbidity, len(lon), axis=3)
+
         # Check your time parsing operations:
         time_datetime = [cftime.datetime.strptime(t, '%Y-%m-%dT%H:%M:%S%z') for t in time]
+
+        
 
         # Create xarray DataArray for sea_water_salinity and sea_water_temperature
         ds = xr.Dataset(
             {"sea_water_salinity": (["time", "depth", "lat", "lon"], sea_water_salinity.astype(np.float64)),
-             "sea_water_temperature": (["time", "depth", "lat", "lon"], sea_water_temperature.astype(np.float64))},
+             "sea_water_temperature": (["time", "depth", "lat", "lon"], sea_water_temperature.astype(np.float64)),
+             "sea_water_turbidity": (["time", "depth", "lat", "lon"], sea_water_turbidity.astype(np.float64))},
             coords={"time": time_datetime, "depth": depth, "lat": lat, "lon": lon},
         )
 
@@ -92,6 +107,7 @@ try:
         # Add the standard_name attribute to the salinity and temperature variables
         ds.sea_water_salinity.attrs['standard_name'] = 'sea_water_salinity'
         ds.sea_water_temperature.attrs['standard_name'] = 'sea_water_temperature'
+        ds.sea_water_turbidity.attrs['standard_name'] = 'sea_water_turbidity'
 
         # Add units to the sea_water_temperature variable
         ds.sea_water_temperature.attrs['units'] = 'Celsius'
