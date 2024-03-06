@@ -28,7 +28,7 @@ class HydroParticle(LagrangianArray):
 
         ('turbidity', {'dtype': np.float32,
                          'units': 'NTU',
-                         'default': 25.0}),
+                         'default': 0.1}),
 
 
         ('current_drift_factor', {'dtype': np.float32,

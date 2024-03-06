@@ -10,11 +10,12 @@ class VirtualLander():
     - Salinity
     - Temperature
     '''
-    maxlat, minlat, maxlon, minlon, center_lat, center_lon = 0, 0, 0, 0, 0, 0
+    maxlat, minlat, maxlon, minlon, center_lat, center_lon, particle_center_lat, particle_center_lon = 0, 0, 0, 0, 0, 0, 0 ,0
     
-    df_salinity = 20
-    df_temperature = 8
-    df_turbidity = 1.0
+    
+    df_salinity = 30
+    df_temperature = 7
+    df_turbidity = 0.1
 
     arr_salinity = []
     arr_temperature = []
@@ -103,8 +104,15 @@ class VirtualLander():
             self.arr_turbidity[duration] = new_turbidity
             #print(f"Lander {self.id} values updated.")
 
-    ## Lag metode for å kunne finne midtpunktet for alle partiklene som er innom gridden til gitt tid
-
+    ## Lag metode for å kunne finne midtpunktet for alle partiklene som er innom griden til gitt tid
+    def calculate_particle_center_point(self, lat, lon):
+        if self.particle_center_lat == 0 and self.particle_center_lon == 0:
+            self.particle_center_lat = lat
+            self.particle_center_lon = lon
+        
+        else:
+            self.particle_center_lat = np.float32((self.particle_center_lat + lat) / 2)
+            self.particle_center_lat = np.float32((self.particle_center_lon + lon) / 2)
 
     def contains(self, lat, lon):
         '''

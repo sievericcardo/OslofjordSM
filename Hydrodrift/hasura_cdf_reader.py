@@ -4,7 +4,7 @@ from datetime import datetime
 import csv
 
 
-data = nc.Dataset('output_file.nc', 'r+')
+data = nc.Dataset('hasura_data_hourly.nc', 'r+')
 
 time_var = data.variables['time']
 
@@ -16,7 +16,7 @@ print(data.variables["time"])
 
 
 selected_vars = ["time", "lon", "lat","sea_water_salinity", "sea_water_temperature", "sea_water_turbidity"]
-selected_vars =[]
+#selected_vars =[]
 for var_name in selected_vars:
     var_data = data.variables[var_name][:]
     var_size = var_data.size
