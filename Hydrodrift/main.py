@@ -110,7 +110,7 @@ if __name__ == "__main__":
                 json_data = json.dumps(record_data)
                 postSim.data_for_muation(json_data)
 
-    #postSim.run_mutation()
+    postSim.run_mutation()
     print("POST data complete")
     print("===============================================\n\n")
 
