@@ -18,9 +18,12 @@ class QueryAPI():
         }
 
 
-    def pullDataAPI(self, start_datetime, end_datetime):
+    def query_data_API(self, start_datetime, end_datetime):
         """
-        Pulls data from the API and creates a netCDF file with hourly values
+        Pulls sensordata from the API and creates a netCDF file with hourly values
+        Required variables:
+            start_datetime
+            end_datetime
         """        
         # Set the start and end dates
         start_from = start_datetime
@@ -146,61 +149,76 @@ class QueryAPI():
             
         
     def calculate_hourly_average(self, data, type):
-                        hourly_average = {}
+        """
+        Calculated hourly average
+        Required variables:
+            data
+            type
+        """      
+                        
+        hourly_average = {}
 
-                        if type == "salinity":
-                            for entry in data:
-                                record_time = datetime.datetime.fromisoformat(entry["record_time"])
-                                hour_key = record_time.replace(minute=0, second=0, microsecond=0).isoformat()
+        if type == "salinity":
+            for entry in data:
+                record_time = datetime.datetime.fromisoformat(entry["record_time"])
+                hour_key = record_time.replace(minute=0, second=0, microsecond=0).isoformat()
 
-                                if hour_key not in hourly_average:
-                                    hourly_average[hour_key] = {
-                                        "temperature_sum": 0,
-                                        "conductivity_sum": 0,
-                                        "count": 0
-                                    }
+                if hour_key not in hourly_average:
+                    hourly_average[hour_key] = {
+                        "temperature_sum": 0,
+                        "conductivity_sum": 0,
+                        "count": 0
+                    }
 
-                                hourly_average[hour_key]["temperature_sum"] += entry["temperature"]
-                                hourly_average[hour_key]["conductivity_sum"] += entry["conductivity"]
-                                hourly_average[hour_key]["count"] += 1
+                hourly_average[hour_key]["temperature_sum"] += entry["temperature"]
+                hourly_average[hour_key]["conductivity_sum"] += entry["conductivity"]
+                hourly_average[hour_key]["count"] += 1
 
-                            for key, value in hourly_average.items():
-                                value["temperature"] = value["temperature_sum"] / value["count"]
-                                value["conductivity"] = value["conductivity_sum"] / value["count"]
-                                del value["temperature_sum"]
-                                del value["conductivity_sum"]
-                                del value["count"]
+            for key, value in hourly_average.items():
+                value["temperature"] = value["temperature_sum"] / value["count"]
+                value["conductivity"] = value["conductivity_sum"] / value["count"]
+                del value["temperature_sum"]
+                del value["conductivity_sum"]
+                del value["count"]
 
-                            return hourly_average
+            return hourly_average
 
-                        else:
-                            for entry in data:
-                                record_time = datetime.datetime.fromisoformat(entry["record_time"])
-                                hour_key = record_time.replace(minute=0, second=0, microsecond=0).isoformat()
+        else:
+            for entry in data:
+                record_time = datetime.datetime.fromisoformat(entry["record_time"])
+                hour_key = record_time.replace(minute=0, second=0, microsecond=0).isoformat()
 
-                                if hour_key not in hourly_average:
-                                    hourly_average[hour_key] = {
-                                        "turbidity_sum": 0,
-                                        "count": 0
-                                    }
+                if hour_key not in hourly_average:
+                    hourly_average[hour_key] = {
+                        "turbidity_sum": 0,
+                        "count": 0
+                    }
 
-                                hourly_average[hour_key]["turbidity_sum"] += entry["turbidity"]
-                                hourly_average[hour_key]["count"] += 1
+                hourly_average[hour_key]["turbidity_sum"] += entry["turbidity"]
+                hourly_average[hour_key]["count"] += 1
 
-                            for key, value in hourly_average.items():
-                                value["turbidity"] = value["turbidity_sum"] / value["count"]
-                                del value["turbidity_sum"]
-                                del value["count"]
+            for key, value in hourly_average.items():
+                value["turbidity"] = value["turbidity_sum"] / value["count"]
+                del value["turbidity_sum"]
+                del value["count"]
 
-                            return hourly_average
+            return hourly_average
     
 
-    def data_for_muation(self, json_data):
+    def data_for_mutation(self, json_data):
+        """
+        Prepares data for mutation
+        Required variables:
+            json_data
+        """    
         # Append the JSON data to the results list
         self.results.append(json.loads(json_data))
 
 
-    def run_mutation(self):         
+    def mutation_data_API(self):    
+        """
+        Post data to the API
+        """         
         # GraphQL mutation with variables
         mutation_query = """
         mutation MyMutation($objects: [simulations_insert_input!]!) {

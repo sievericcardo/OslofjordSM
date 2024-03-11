@@ -53,17 +53,13 @@ if __name__ == "__main__":
     print("Endtime: " + str(end_time))
     print("===============================================\n\n")
 
-            
-            
- 
-    
-    
+           
     drift = HydroDrift(loglevel=40)
     drift.suppress_qt_warnings()
 
     print("Pulling data from API")
     queryAPI = QueryAPI()
-    queryAPI.pullDataAPI(start_time, end_time+ timedelta(hours=1))
+    queryAPI.query_data_API(start_time, end_time+ timedelta(hours=1))
 
     
     
@@ -124,9 +120,9 @@ if __name__ == "__main__":
 
                 # Convert the dictionary to a JSON string
                 json_data = json.dumps(record_data)
-                queryAPI.data_for_muation(json_data)
+                queryAPI.data_for_mutation(json_data)
 
-    queryAPI.run_mutation()
+    queryAPI.mutation_data_API()
     print("POST data complete")
     print("===============================================\n\n")
 
