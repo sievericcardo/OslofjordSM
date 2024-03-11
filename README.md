@@ -1,3 +1,4 @@
+![alt text](https://copilot.microsoft.com/images/create/hydrodrift-logo/1-65ef0e0b40554818a02a42c22bdef638?id=t1l3PxVgRHj3J5HepUhnkA%3d%3d&view=detailv2&idpp=genimg&idpclose=1&thId=OIG4.xu64pjOtdQjyLNhgMwL5&FORM=SYDBIC)
 # HydroDrift
 
 Opendrift setup
