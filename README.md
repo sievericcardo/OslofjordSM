@@ -1,4 +1,4 @@
-# Opendrift
+# HydroDrift
 
 Opendrift setup
 can be found here:
@@ -9,10 +9,10 @@ https://github.com/OpenDrift/opendrift
 
 Install Anaconda to the computer and open the prompt.
 
-1.	Navigate to the Opendrift file:
+1.	Navigate to the Opendrift directory:
  
 
-2.	Use this to create an environment
+2.	run this to create an environment
 ```
 conda env create -f environment.yml
 ```
@@ -26,39 +26,45 @@ conda activate opendrift
 
  
 
-4.	Then use this:  
+4.	Then run this to install dependencies  
 ```
 pip install --no-deps -e .
+pip install psycopg2
+pip install logger
 ```
+#Remember to update dependecy file
 
 5.	Now you could run any model by typing python, and then the filename
  
 
  
-# To run in conda
+# To run HydroDrift in conda
 
-1. First create the API netCDF file with sensor data for the driftmodel
-```
-python api_to_nc.py
-```
 
-2. Run the drift simulator
+Run the drift model by navigating to HydroDrift and then:
 ```
-python HydroDrift.py
+python main.py
 ```
 
 The result:
 - Outputfile with particle properties
 - Visual simulation
-- Print Virtual Lander data
+- Update the API with results
+
+
+The main function has initial end simulation date set as 2023-4-13 15.00.00,
+but could also be run with arguments for date time:
+```
+python main.py "year" "month" "day" "hour"
+```
+
+Example:
+```
+python main.py 2023 4 14 16
+```
+
+This requires available sensordata in the API (for the previous 24 hours)
 
 
 
 
-More indept++
-
-'''
-Pip install zarr
-Netcdf4
-xarray
-'''
