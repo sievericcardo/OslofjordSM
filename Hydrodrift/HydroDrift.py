@@ -1,18 +1,12 @@
 from opendrift.models import basemodel 
 from opendrift.models.oceandrift import OceanDrift 
 from datetime import datetime, timedelta 
-from opendrift.readers import reader_netCDF_CF_generic, reader_netCDF_CF_unstructured, reader_timeseries
 import logger
 
 from HydroParticle import HydroParticle 
 from VirtualLander import VirtualLander
-from postAPI import HasuraMutaion
 import numpy as np
-import json
-
 import csv
-
-import sys
 
 class HydroDrift(OceanDrift):
     
@@ -148,6 +142,9 @@ class HydroDrift(OceanDrift):
             print("Turbidity data not found in environment.")
 
 
+    # ---------------------------------------------------
+    # Work in progress
+
     def calculate_salinity_diffusion(self):
         '''
         Method to calculate diffusion of the salinity
@@ -164,14 +161,25 @@ class HydroDrift(OceanDrift):
 
         # Predefined or calculated value for diffusion
         diffusion = 0.001
+
+    def calculate_turbidity_diffusion(self):
+        '''
+        Method to calculate diffusion of the turbidity
+        ''' 
+
+        # Predefined or calculated value for diffusion
+        diffusion = 0.001
+
+
+    # ---------------------------------------------------
         
 
-    
 
     
     def update(self):
-        #print(salinity_reader)
-
+        '''
+        Method to update the particles during simulation
+        ''' 
         # Simply move particles with ambient current
         self.advect_ocean_current()
 
@@ -457,8 +465,7 @@ class HydroDrift(OceanDrift):
 
     def update_lander(self):
         '''
-        Method to check if paticle is in any lander area and the updating the lander value
-        
+        Method to cupdate lander values
         '''
         current_sim_time = self.time
           
@@ -470,12 +477,12 @@ class HydroDrift(OceanDrift):
 
     def smooth_landerlist(self):
         '''
-        Method to smoothen the values set in the Virtual landers. This wil only affect the landers with the change set to True
+        Method to smoothen the values of the landers. This wil only affect the landers with the change set to True
         '''
         for lander in self.lander_list:
             if lander.change == True:
                 lander.smoother()
-                #lander.print_lander()
+                
 
     def write_landers_to_csv(self):
         '''
@@ -492,163 +499,16 @@ class HydroDrift(OceanDrift):
                         writer.writerow([f"Datetime: {lander.arr_datetime[ind]}"])
                         writer.writerow([f"Salinity: {lander.arr_salinity[ind]}"])
                         writer.writerow([f"Temperature: {lander.arr_temperature[ind]}"])
-                        writer.writerow(f"Turbidity: {lander.arr_turbidity[ind]}")
+                        writer.writerow([f"Turbidity: {lander.arr_turbidity[ind]}"])
                         writer.writerow([f"Status of update {lander.arr_change[ind]}"])
                         writer.writerow(["\n"])
                     writer.writerow(["\n\n\n"])
 
 
-def suppress_qt_warnings(): 
-    from os import environ 
-    environ["QT_DEVICE_PIXEL_RATIO"] = "0" 
-    environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1" 
-    environ["QT_SCREEN_SCALE_FACTORS"] = "1" 
-    environ["QT_SCALE_FACTOR"] = "1"
+    def suppress_qt_warnings(self): 
+        from os import environ 
+        environ["QT_DEVICE_PIXEL_RATIO"] = "0" 
+        environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1" 
+        environ["QT_SCREEN_SCALE_FACTORS"] = "1" 
+        environ["QT_SCALE_FACTOR"] = "1"
 
-
-    
-
-
-if __name__ == "__main__": 
-    suppress_qt_warnings()
-
-    # INIT VARIABLES
-    # List of seeding points/lander locations
-    latSensorList = []
-    lonSensorList = []
-
-
-    # DEFAULT VALUES
-    # Location in degrees
-    #lat = 59.65
-    #lon = 10.62
-
-
-    lat, lon = 59.658233, 10.624583
-    # Seed length in hours
-    seed_length = 24
-    # Start and end datetime
-    t1 = datetime(2023, 4, 12, 15)
-    t2 = t1 + timedelta(hours=seed_length)
-
-
-    
-
-    arg_len = len(sys.argv)
-
-    if arg_len > 1:
-        for arg in sys.argv:
-            print(arg)
- 
-        
-
-    o = HydroDrift(loglevel=30)
-    
-    latSensorList.append(lat)
-    lonSensorList.append(lon)
-
-
-    # Creation of Virtual Landers
-    size_lat = 0.05
-    size_lon = 0.05
-    o.create_landers_from_list(t1,seed_length, size_lat, size_lon)
-
-    '''
-    lat1 = 59.817
-    lon1 = 10.513
-
-    latSensorList.append(lat1)
-    lonSensorList.append(lon1)
-
-    lat2 = 59.865
-    lon2 = 10.608
-
-    latSensorList.append(lat2)
-    lonSensorList.append(lon2)
-    
-    '''
-
-    
-
-
-    # Load API data from NetCDF file 
-    filename = 'hasura_data_hourly.nc'
-    salinity_reader = reader_netCDF_CF_generic.Reader(filename)
-    print('Variables in the NetCDF file:', salinity_reader.variables)
-   
-
-
-
-
-    #print('Salinity variable name:', salinity_reader.variable_mapping['sea_water_salinity'])
-    #print('Temperature variable name:', salinity_reader.variable_mapping['sea_water_temperature'])
-    #print('Turbidity variable name:', salinity_reader.variable_mapping['sea_water_turbidity'])
-
-    o.add_reader(salinity_reader)
-    o.add_readers_from_list(
-    ['https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be'])
-
-    print(o.readers)
-
-    print(salinity_reader)
-
-   
-
-    
-    
-    
-    #print(o.get_variables)
-    
-    number = 1
-    for i in range(len(latSensorList)):
-        o.seed_elements(lon=lonSensorList[i], lat=latSensorList[i], time=[t1, t2],
-                        number=20, radius=200)
-
-    seed_times = o.elements_scheduled_time[0:number]
-
-   
-
-
-    # 60 min interval in 24 hours until all particles deactivate or timeout
-    # Remember time:units = "seconds since 1970-01-01 00:00:00" ;
-    o.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
-   
-
-
-    o.smooth_landerlist()
-    
-            #o.seed_elements(lon=lander.center_lon, lat=lander.center_lat, time=t1, number=100000)
-    
-    postSim = HasuraMutaion()
-
-    for lander in o.lander_list:
-        if lander.change == True:   
-            lander.print_lander()
-            for ind in range(lander.seed_length):
-                record_data = {
-                    "record_time": f"{lander.arr_datetime[ind]}",
-                    "conductivity": f"{lander.arr_salinity[ind]}",
-                    "temperature": f"{lander.arr_temperature[ind]}",
-                    "turbidity": f"{lander.arr_turbidity[ind]}",
-                    "grid_id": f"{lander.id}",
-                }
-
-                # Convert the dictionary to a JSON string
-                json_data = json.dumps(record_data)
-                postSim.data_for_muation(json_data)
-
-    #postSim.run_mutation()
-
-    o.write_landers_to_csv()
-    
-                
-                    
-
-
-    
-
-    #o.write_netcdf_density_map('output_filename.nc')
-    o.animation(fast=True, filename='hydrodrift_sim_vis.mp4')
-
-
-    

@@ -1,32 +1,26 @@
 from datetime import datetime, timedelta 
 from opendrift.readers import reader_netCDF_CF_generic
-
-
-from postAPI import HasuraMutaion
 from HydroDrift import HydroDrift
-from timescaleAPI import QueryAPI
-
+from API import QueryAPI
 import json
 import sys
-
-
-def suppress_qt_warnings(): 
-    from os import environ 
-    environ["QT_DEVICE_PIXEL_RATIO"] = "0" 
-    environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1" 
-    environ["QT_SCREEN_SCALE_FACTORS"] = "1" 
-    environ["QT_SCALE_FACTOR"] = "1"
-
-
     
 
 if __name__ == "__main__": 
-    suppress_qt_warnings()
+    '''
+    Args:
+    1: Year
+    2: Month
+    3: Day
+    4: Hour
+    
+    '''
 
     # INIT VARIABLES
     # List of seeding points/lander locations
     latSensorList = []
     lonSensorList = []
+    end_time,start_time = 0, 0
 
 
     # DEFAULT VALUES
@@ -35,20 +29,43 @@ if __name__ == "__main__":
     # Seed length in hours
     seed_length = 24
     # Start and end datetime
-    t1 = datetime(2023, 4, 12, 15)
-    t2 = t1 + timedelta(hours=seed_length)
+    end_time = datetime(2023, 4, 13, 15)
+    start_time = end_time - timedelta(hours=seed_length)
 
 
     arg_len = len(sys.argv)
 
-    if arg_len > 1:
+    if arg_len > 3:
         for arg in sys.argv:
             print(arg)
- 
-        
 
-    o = HydroDrift(loglevel=40)
-    QueryAPI()
+
+        if arg_len == 4:
+            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + timedelta(hours=int(sys.argv[4]))
+        else:
+            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
+
+
+        
+        start_time = end_time - timedelta(hours=seed_length)
+
+    print("Starttime: " + str(start_time))
+    print("Endtime: " + str(end_time))
+    print("===============================================\n\n")
+
+            
+            
+ 
+    
+    
+    drift = HydroDrift(loglevel=40)
+    drift.suppress_qt_warnings()
+
+    print("Pulling data from API")
+    queryAPI = QueryAPI()
+    queryAPI.pullDataAPI(start_time, end_time+ timedelta(hours=1))
+
+    
     
     latSensorList.append(lat)
     lonSensorList.append(lon)
@@ -57,44 +74,43 @@ if __name__ == "__main__":
     # Creation of Virtual Landers
     size_lat = 0.05
     size_lon = 0.05
-    o.create_landers_from_list(t1,seed_length, size_lat, size_lon)
+    print("Creating Virtual Landers")
+    drift.create_landers_from_list(start_time,seed_length, size_lat, size_lon)
     
 
 
     # Load API data from NetCDF file 
-    filename = 'hasura_data_hourly.nc'
+    filename = 'sensor_data.nc'
     salinity_reader = reader_netCDF_CF_generic.Reader(filename)
     #print('Variables in the NetCDF file:', salinity_reader.variables)
    
-    o.add_reader(salinity_reader)
-    o.add_readers_from_list(
+    drift.add_reader(salinity_reader)
+    drift.add_readers_from_list(
     ['https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be'])
 
-    print(o.readers)
+    print(drift.readers)
     print("===============================================\n\n")
 
 
     # Run the model
     number = 1
     for i in range(len(latSensorList)):
-        o.seed_elements(lon=lonSensorList[i], lat=latSensorList[i], time=[t1, t2],
-                        number=20, radius=200)
+        drift.seed_elements(lon=lonSensorList[i], lat=latSensorList[i], time=[start_time, end_time],
+                        number=200, radius=20)
 
-    seed_times = o.elements_scheduled_time[0:number] 
+    seed_times = drift.elements_scheduled_time[0:number] 
 
     # 60 min interval in 24 hours until all particles deactivate or timeout
     # Remember time:units = "seconds since 1970-01-01 00:00:00" ;
-    o.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
+    drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
     print("Model run complete")
     print("===============================================\n\n")
 
 
     # Post prep of data  
-    o.smooth_landerlist()
-    
-    postSim = HasuraMutaion()
+    drift.smooth_landerlist()
 
-    for lander in o.lander_list:
+    for lander in drift.lander_list:
         if lander.change == True:   
             #lander.print_lander()
             for ind in range(lander.seed_length):
@@ -108,18 +124,19 @@ if __name__ == "__main__":
 
                 # Convert the dictionary to a JSON string
                 json_data = json.dumps(record_data)
-                postSim.data_for_muation(json_data)
+                queryAPI.data_for_muation(json_data)
 
-    postSim.run_mutation()
+    queryAPI.run_mutation()
     print("POST data complete")
     print("===============================================\n\n")
 
 
     # CSV and Simulation
-    o.write_landers_to_csv()
-    o.animation(fast=True, filename='hydrodrift_sim_vis.mp4')
+    drift.write_landers_to_csv()
+    drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
-    print("===============================================\n\n")
-
+    print
+    ("===============================================\n\n")
+    
 
     

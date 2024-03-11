@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 class VirtualLander():
     '''
-    variables:
+    Variables:
     - Time
     - Location
     - Change 
@@ -13,8 +13,8 @@ class VirtualLander():
     maxlat, minlat, maxlon, minlon, center_lat, center_lon, particle_center_lat, particle_center_lon = 0, 0, 0, 0, 0, 0, 0 ,0
     
     
-    df_salinity = 30
-    df_temperature = 7
+    df_salinity = 30.0
+    df_temperature = 5.0
     df_turbidity = 0.1
 
     arr_salinity = []
@@ -39,9 +39,12 @@ class VirtualLander():
         '''
         Method to create a single lander
         Required variables:
-            lat
-            lon
+            min_lat
+            max_lat
+            min_lon
+            max_lon
             starttime
+            seed_length
         '''
 
         self.starttime = starttime
@@ -68,17 +71,17 @@ class VirtualLander():
 
     def update_lander(self, sim_salinity, sim_temperature, sim_turbidity, sim_time):
         '''
-        Method to update the landers Salinity and Temperature
+        Method to update the lander salinity, temperature and turbidity
         Required variables:
             salinity
             temperature
+            turbidity
             current run time
         
         '''
         
         time_difference = (sim_time - self.starttime)
         
-
         duration = int(time_difference.total_seconds() / 3600)
 
         self.change = True
@@ -106,6 +109,12 @@ class VirtualLander():
 
     ## Lag metode for å kunne finne midtpunktet for alle partiklene som er innom griden til gitt tid
     def calculate_particle_center_point(self, lat, lon):
+        '''
+        Method to find center point for the particles entering the lander area
+        Required variables:
+            lat
+            lon
+        '''
         if self.particle_center_lat == 0 and self.particle_center_lon == 0:
             self.particle_center_lat = lat
             self.particle_center_lon = lon
@@ -116,7 +125,7 @@ class VirtualLander():
 
     def contains(self, lat, lon):
         '''
-        Method to check if current particle is in the lander's area
+        Method to check if current particle is in the lander area
         Required variables:
             lat
             lon
@@ -152,12 +161,14 @@ class VirtualLander():
                             self.arr_salinity[i] = np.float32((self.arr_salinity[i-1] + self.arr_salinity[next_changed_index])/2)
                             self.arr_temperature[i] = np.float32((self.arr_temperature[i-1] + self.arr_temperature[next_changed_index])/2)
                             self.arr_turbidity[i] = np.float32((self.arr_turbidity[i-1] + self.arr_turbidity[next_changed_index])/2)
+                            self.arr_change[i] = True
                             break
                         
                         next_changed_index= next_changed_index+1
 
                     # If the current value is stil set as default, current value will be set as previous value
-                    if self.arr_salinity[i] == self.df_salinity and self.arr_temperature[i] == self.df_temperature and self.arr_turbidity[i] == self.df_turbidity:
+                    #if self.arr_salinity[i] == self.df_salinity and self.arr_temperature[i] == self.df_temperature and self.arr_turbidity[i] == self.df_turbidity:
+                    if self.arr_change[i] == False:    
                         self.arr_salinity[i] = np.float32(self.arr_salinity[i-1])
                         self.arr_temperature[i] = np.float32(self.arr_temperature[i-1])
                         self.arr_turbidity[i] = np.float32(self.arr_turbidity[i-1])
@@ -166,6 +177,11 @@ class VirtualLander():
     def calculate_center(self, max_lat, min_lat, max_lon, min_lon):
         '''
         Method to find centroid of grid
+        Required variables:
+            max_lat
+            min_lat
+            max_lon
+            min_lon
         '''
         self.center_lat = (max_lat + min_lat) / 2
         self.center_lon = (max_lon + min_lon) / 2
