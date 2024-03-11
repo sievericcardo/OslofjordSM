@@ -1,4 +1,4 @@
-# Opendrift
+# HydroDrift
 
 Opendrift setup
 can be found here:
