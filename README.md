@@ -4,7 +4,7 @@
 Opendrift setup can be found here:
 https://opendrift.github.io/install.html
 
-### Setup local 
+## Setup local 
 
 1. Clone the repository.
 
@@ -34,7 +34,7 @@ pip install --no-deps -e .
 5.	Now you could run any model by typing python, and then the filename
  
 
-### Setup Docker
+## Setup Docker
 
 1. Clone the repository.
  
@@ -50,7 +50,7 @@ docker build -t hydrodrift .
 docker run -it --rm hydrodrift
 ```
  
-### Run model
+## Run model
 
 
 Run the drift model by navigating to HydroDrift and then:
