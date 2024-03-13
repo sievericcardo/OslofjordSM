@@ -1,45 +1,56 @@
 
 # <img src="logo.jpg" width="40"> HydroDrift
 
-Opendrift setup
-can be found here:
+Opendrift setup can be found here:
 https://opendrift.github.io/install.html
 
-Initially clone the fit repository for opendrift.
-https://github.com/OpenDrift/opendrift
+### Setup local 
 
-Install Anaconda to the computer and open the prompt.
+1. Clone the repository.
 
-1.	Navigate to the Opendrift directory:
+
+2. Install Anaconda to the computer and open the prompt.
  
 
-2.	run this to create an environment
+3.	Run to create an environment
 ```
 conda env create -f environment.yml
 ```
 
- 
 
-3.	Activate opendrift
+4.	Activate opendrift
 ```
 conda activate opendrift
 ```
 
  
 
-4.	Then run this to install dependencies  
+4. Run to install dependencies  
 ```
 pip install --no-deps -e .
-pip install psycopg2
-pip install logger
 ```
-#Remember to update dependecy file
+
 
 5.	Now you could run any model by typing python, and then the filename
  
 
+### Setup Docker
+
+1. Clone the repository.
  
-# To run HydroDrift in conda
+
+3.	Run to build the image
+```
+docker build -t hydrodrift . 
+```
+
+
+4.	To run the docker
+```
+docker run -it --rm hydrodrift
+```
+ 
+### Run model
 
 
 Run the drift model by navigating to HydroDrift and then:
