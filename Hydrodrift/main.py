@@ -36,17 +36,15 @@ if __name__ == "__main__":
     arg_len = len(sys.argv)
 
     if arg_len > 3:
-        for arg in sys.argv:
-            print(arg)
+        #for arg in sys.argv:
+        #    print(arg)
 
 
-        if arg_len == 4:
-            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + timedelta(hours=int(sys.argv[4]))
+        if arg_len == 5:
+            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + (timedelta(hours=int(sys.argv[4])))
         else:
             end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
-
-
-        
+            
         start_time = end_time - timedelta(hours=seed_length)
 
     print("Starttime: " + str(start_time))
@@ -98,7 +96,8 @@ if __name__ == "__main__":
 
     # 60 min interval in 24 hours until all particles deactivate or timeout
     # Remember time:units = "seconds since 1970-01-01 00:00:00" ;
-    drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
+    #drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
+    drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length))
     print("Model run complete")
     print("===============================================\n\n")
 
@@ -131,8 +130,7 @@ if __name__ == "__main__":
     drift.write_landers_to_csv()
     drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
-    print
-    ("===============================================\n\n")
+    print("===============================================\n\n")
     
 
     

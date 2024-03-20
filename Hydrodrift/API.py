@@ -53,6 +53,8 @@ class QueryAPI():
         try:
             response = requests.post(self.hasura_url, json={"query": graphql_query}, headers=self.headers)
 
+            print(response.text)
+
             if response.status_code == 200:
                 graphql_data = response.json()["data"]["salinity"]
                 turbidity_data = response.json()["data"]["turbidity"]
