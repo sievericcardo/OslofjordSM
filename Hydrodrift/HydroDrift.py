@@ -15,6 +15,8 @@ class HydroDrift(OceanDrift):
 
     lander_list = []
 
+    "test"
+
     # Could set the z limits, but need more information
     #required_profiles_z_range = [-40, 0]
 

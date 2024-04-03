@@ -66,6 +66,9 @@ class QueryAPI():
                 salinity_hourly_avg = self.calculate_hourly_average(graphql_data, "salinity")
                 turbidity_hourly_avg = self.calculate_hourly_average(turbidity_data, "turbidity")
 
+                if (len(salinity_hourly_avg) != len(turbidity_hourly_avg)):
+                    print("Data mismatch: Salinity: " + len(salinity_hourly_avg) + " Turbidity: " + len(turbidity_hourly_avg))
+
                 #print("Salinity Hourly Average:", salinity_hourly_avg)
 
                     # Convert time strings to datetime objects
