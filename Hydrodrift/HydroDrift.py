@@ -9,13 +9,10 @@ import numpy as np
 import csv
 
 class HydroDrift(OceanDrift):
-    
 
     ElementType = HydroParticle
 
     lander_list = []
-
-    "test"
 
     # Could set the z limits, but need more information
     #required_profiles_z_range = [-40, 0]

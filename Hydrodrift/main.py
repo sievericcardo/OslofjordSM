@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # Seed length in hours
     seed_length = 24
     # Start and end datetime
-    end_time = datetime(2023, 4, 13, 15)
+    end_time = datetime(2024, 4, 13, 15)
     start_time = end_time - timedelta(hours=seed_length)
 
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         #    print(arg)
 
 
-        if arg_len == 5:
+        if arg_len >= 4:
             end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + (timedelta(hours=int(sys.argv[4])))
         else:
             end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
@@ -127,8 +127,8 @@ if __name__ == "__main__":
 
 
     # CSV and Simulation
-    drift.write_landers_to_csv()
-    drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
+    #drift.write_landers_to_csv()
+    #drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
     print("===============================================\n\n")
     
