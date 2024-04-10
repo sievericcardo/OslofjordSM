@@ -190,9 +190,9 @@ class QueryAPI():
                 ds.attrs['standard_name_vocabulary'] = 'CF-1.6'
 
                 # Add the standard_name attribute to the salinity variable: improtant to get environment variable
-                ds.sea_water_salinity.attrs['standard_name'] = 'sea_water_salinity'
-                ds.sea_water_temperature.attrs['standard_name'] = 'sea_water_temperature'
-                ds.sea_water_turbidity.attrs['standard_name'] = 'sea_water_turbidity'
+                ds.sea_water_salinity.attrs['standard_name'] = 'salinity'
+                ds.sea_water_temperature.attrs['standard_name'] = 'temperature'
+                ds.sea_water_turbidity.attrs['standard_name'] = 'turbidity'
 
                 # Save the data to a NetCDF file
                 ds.to_netcdf("sensor_data.nc")

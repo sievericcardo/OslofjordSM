@@ -14,6 +14,8 @@ class HydroDrift(OceanDrift):
 
     lander_list = []
 
+    count = 0
+
     # Could set the z limits, but need more information
     #required_profiles_z_range = [-40, 0]
 
@@ -91,11 +93,21 @@ class HydroDrift(OceanDrift):
             'fallback': 34,
             'profiles': True
         },
-        'sea_water_turbidity': {
+        'temperature': {
+            'fallback': 10,
+            'profiles': True
+        },
+        'salinity': {
+            'fallback': 34,
+            'profiles': True
+        },
+        'turbidity': {
             'fallback': 0.42,
             'important' : True,
             'profiles' : True
         }
+        
+
     }
 
 
@@ -115,7 +127,7 @@ class HydroDrift(OceanDrift):
         Salinity update method for the particle using the environment data
         '''
         try:
-            self.elements.salinity = self.environment.sea_water_salinity
+            self.elements.salinity = self.environment.salinity
         except AttributeError:
             print("Salinity data not found in environment.")
 
@@ -124,9 +136,8 @@ class HydroDrift(OceanDrift):
         '''
         Temperature update method for the particle using the environment data
         '''
-        #print(self.environment.sea_water_temperature)
         try:
-            self.elements.temperature = self.environment.sea_water_temperature
+            self.elements.temperature = self.environment.temperature
         except AttributeError:
             print("Temperature data not found in environment.")
 
@@ -136,7 +147,7 @@ class HydroDrift(OceanDrift):
         '''
         #print(self.environment.sea_water_turbidity)
         try:
-            self.elements.turbidity = self.environment.sea_water_turbidity
+            self.elements.turbidity = self.environment.turbidity
         except AttributeError:
             print("Turbidity data not found in environment.")
 
@@ -147,10 +158,15 @@ class HydroDrift(OceanDrift):
         '''
         Method to calculate diffusion of the salinity
         ''' 
+        self.count+= 1
 
-        # Predefined or calculated value for diffusion
+        if self.count == 1:
+            return self.environment.salinity
         
-        diffusion = 0.001
+        else: 
+            diff = self.environment.salinity - self.environment.sea_water_salinity
+            result = self.environment.salinity - diff/2
+            return result
         
 
     def calculate_temperature_diffusion(self):
@@ -158,8 +174,13 @@ class HydroDrift(OceanDrift):
         Method to calculate diffusion of the temperature
         ''' 
 
-        # Predefined or calculated value for diffusion
-        diffusion = 0.001
+        if self.count == 1:
+            return self.environment.temperature
+        
+        else: 
+            diff = self.environment.temperature - self.environment.sea_water_temperature
+            result = self.environment.temperature- diff/2
+            return result
 
     def calculate_turbidity_diffusion(self):
         '''

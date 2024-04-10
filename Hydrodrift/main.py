@@ -113,6 +113,7 @@ if __name__ == "__main__":
     # Post prep of data  
     drift.smooth_landerlist()
 
+    
     for lander in drift.lander_list:
         #if lander.change == True:   
             #lander.print_lander()
@@ -129,7 +130,7 @@ if __name__ == "__main__":
                 json_data = json.dumps(record_data)
                 queryAPI.data_for_mutation(json_data)
 
-
+    
     queryAPI.reset_data_API()
     print("Reset data complete")
     print("===============================================\n\n")

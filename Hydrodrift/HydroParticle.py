@@ -10,18 +10,6 @@ class HydroParticle(LagrangianArray):
 
     # Create custom variables for the current particle
     variables = LagrangianArray.add_variables([
-        ('salinity', {'dtype': np.float32,
-                      'units': 'PSU',
-                      'default': 20.0}),
-
-        ('temperature', {'dtype': np.float32,
-                         'units': 'Celsius',
-                         'default': 25.0}),
-
-        ('turbidity', {'dtype': np.float32,
-                         'units': 'NTU',
-                         'default': 0.1}),
-
 
         ('current_drift_factor', {'dtype': np.float32,
                                   'units': '',
