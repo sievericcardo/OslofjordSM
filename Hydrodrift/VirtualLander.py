@@ -13,9 +13,9 @@ class VirtualLander():
     maxlat, minlat, maxlon, minlon, center_lat, center_lon, particle_center_lat, particle_center_lon = 0, 0, 0, 0, 0, 0, 0 ,0
     
     
-    df_salinity = 30.0
-    df_temperature = 5.0
-    df_turbidity = 0.1
+    df_salinity = None
+    df_temperature = None
+    df_turbidity = None
 
     arr_salinity = []
     arr_temperature = []

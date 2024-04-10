@@ -328,6 +328,27 @@ class QueryAPI():
             print(f"Error during HTTP request: {e}")
             exit()
 
+    def reset_data_API(self):
+
+        mutation_query = """
+        mutation MyMutation {
+            delete_simulations(where: {id_sim: {_gt: 0}}) {
+                affected_rows
+            }
+        }
+        """
+        try:
+            response = requests.post(self.hasura_url, json={"query": mutation_query}, headers=self.headers)
+            if response.status_code == 200:
+                print("Reset successful")
+                print(response.json())
+            else:
+                print("Reset failed")
+                print(response.text)
+                exit()
+        except requests.RequestException as e:
+            print(f"Error during HTTP request: {e}")
+            exit()
 
     def cdf_reader(self):
         data = nc.Dataset('hasura_data_hourly.nc', 'r+')

@@ -142,7 +142,6 @@ class HydroDrift(OceanDrift):
 
 
     # ---------------------------------------------------
-    # Work in progress
 
     def calculate_salinity_diffusion(self):
         '''
@@ -150,6 +149,7 @@ class HydroDrift(OceanDrift):
         ''' 
 
         # Predefined or calculated value for diffusion
+        
         diffusion = 0.001
         
 

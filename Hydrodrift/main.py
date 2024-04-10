@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
     # DEFAULT VALUES
     # Location in degrees
-    lat, lon = 59.658233, 10.624583
+    #lat, lon = 59.658233, 10.624583
     # Seed length in hours
     seed_length = 24
     # Start and end datetime
@@ -87,10 +87,13 @@ if __name__ == "__main__":
     drift.add_readers_from_list(
     ['https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be'])
 
+
+
+
+    
     print(drift.readers)
     print("===============================================\n\n")
-
-
+    
     # Run the model
     number = 1
     for i in range(len(latSensorList)):
@@ -111,8 +114,8 @@ if __name__ == "__main__":
     drift.smooth_landerlist()
 
     for lander in drift.lander_list:
-        if lander.change == True:   
-            lander.print_lander()
+        #if lander.change == True:   
+            #lander.print_lander()
             for ind in range(lander.seed_length):
                 record_data = {
                     "record_time": f"{lander.arr_datetime[ind]}",
@@ -125,6 +128,12 @@ if __name__ == "__main__":
                 # Convert the dictionary to a JSON string
                 json_data = json.dumps(record_data)
                 queryAPI.data_for_mutation(json_data)
+
+
+    queryAPI.reset_data_API()
+    print("Reset data complete")
+    print("===============================================\n\n")
+
 
     queryAPI.mutation_data_API()
     print("POST data complete")
