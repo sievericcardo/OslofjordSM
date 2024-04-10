@@ -22,6 +22,12 @@ class QueryAPI():
         }
 
     def query_location_API(self, start_datetime, end_datetime):
+        """
+        Pulls relevant locations from the API
+        Required variables:
+            start_datetime
+            end_datetime
+        """   
         start_from = start_datetime
         end_to = end_datetime
 

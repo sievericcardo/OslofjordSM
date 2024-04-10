@@ -5,15 +5,7 @@ import numpy as np
 
 class HydroParticle(LagrangianArray):
     '''
-    Base variables: 
-        ID
-        status
-        moving
-        age_seconds
-        orgin_marker
-        lon
-        lat
-        z
+    Class defining Hydroparticles
     '''
 
     # Create custom variables for the current particle
