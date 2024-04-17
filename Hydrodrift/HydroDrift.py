@@ -126,6 +126,8 @@ class HydroDrift(OceanDrift):
         '''
         Salinity update method for the particle using the environment data
         '''
+        #if self.environment.salinity == 34:
+
         try:
             self.elements.salinity = self.environment.salinity
         except AttributeError:
@@ -136,6 +138,8 @@ class HydroDrift(OceanDrift):
         '''
         Temperature update method for the particle using the environment data
         '''
+        #if self.environment.temperature == 10:
+            
         try:
             self.elements.temperature = self.environment.temperature
         except AttributeError:
