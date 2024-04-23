@@ -13,8 +13,8 @@ class QueryAPI():
     def __init__(self):
         self.results = []
         self.locationlist = []
-        self.hasura_url = "http://localhost:8080/v1/graphql"
-        #self.hasura_url = "http://172.17.0.1:8080/v1/graphql"
+        #self.hasura_url = "http://localhost:8080/v1/graphql"
+        self.hasura_url = "http://172.17.0.1:8080/v1/graphql"
         
         self.headers = {
             "Content-Type": "application/json",

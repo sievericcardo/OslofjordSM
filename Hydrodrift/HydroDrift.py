@@ -503,6 +503,7 @@ class HydroDrift(OceanDrift):
         '''
         Method to smoothen the values of the landers. This wil only affect the landers with the change set to True
         '''
+    
         for lander in self.lander_list:
             if lander.change == True:
                 lander.smoother()

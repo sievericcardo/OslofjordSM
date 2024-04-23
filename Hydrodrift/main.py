@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # Seed length in hours
     seed_length = 24
     # Start and end datetime
-    end_time = datetime(2024, 3, 4, 0)
+    end_time = datetime(2024, 4, 10, 0)
     start_time = end_time - timedelta(hours=seed_length)
 
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     size_lat = 0.05
     size_lon = 0.05
     print("Creating Virtual Landers")
-    drift.create_landers_from_list(start_time,seed_length*2, size_lat, size_lon)
+    drift.create_landers_from_list(start_time,seed_length, size_lat, size_lon)
     
 
 
@@ -98,14 +98,14 @@ if __name__ == "__main__":
     number = 1
     for i in range(len(latSensorList)):
         drift.seed_elements(lon=lonSensorList[i], lat=latSensorList[i], time=[start_time, end_time],
-                        number=200, radius=20)
+                        number=500, radius=20)
 
     seed_times = drift.elements_scheduled_time[0:number] 
 
     # 60 min interval in 24 hours until all particles deactivate or timeout
     # Remember time:units = "seconds since 1970-01-01 00:00:00" ;
     #drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length), outfile='output_file.nc')
-    drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length*2))
+    drift.run(time_step=timedelta(minutes=60), duration=timedelta(hours=seed_length))
     print("Model run complete")
     print("===============================================\n\n")
 
@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     # CSV and Simulation
     #drift.write_landers_to_csv()
-    drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
+    #drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
     print("===============================================\n\n")
     

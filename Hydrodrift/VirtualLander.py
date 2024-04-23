@@ -143,15 +143,12 @@ class VirtualLander():
         The Change-value will not be changed, but rather fill in the default values with smoothe values.       
         '''
         for i in range(self.seed_length):
-            if i == 0 or self.arr_change[i] == True: #må endre or self.arr_change[i-1] == False
+            if self.arr_change[i] == True: #må endre or self.arr_change[i-1] == False
                 continue
                 #skip
             
             # Check if current value is unchanged AND if the previous value is changed, OR if the previous values have been smoothen
-            elif self.arr_change[i] == False  and (self.arr_change[i-1] == True or 
-                                                   (self.arr_salinity[i-1] != self.df_salinity and 
-                                                    self.arr_temperature[i-1] != self.df_temperature and 
-                                                    self.arr_turbidity[i-1] != self.df_turbidity)):
+            elif self.arr_change[i] == False  and (self.arr_change[i-1] == True):
                     next_changed_index = i+1
 
                     # Check if there are any changed values after the current unchanged default values. 
@@ -172,6 +169,20 @@ class VirtualLander():
                         self.arr_salinity[i] = np.float32(self.arr_salinity[i-1])
                         self.arr_temperature[i] = np.float32(self.arr_temperature[i-1])
                         self.arr_turbidity[i] = np.float32(self.arr_turbidity[i-1])
+                        self.arr_change[i] = True
+
+            # If there arent any previous values set the current value
+            elif self.arr_change[i] == False:
+                next_changed_index = i+1
+                while next_changed_index < self.seed_length:
+                        if self.arr_change[next_changed_index] == True:
+                            self.arr_salinity[i] = np.float32(self.arr_salinity[next_changed_index])
+                            self.arr_temperature[i] = np.float32(self.arr_temperature[next_changed_index])
+                            self.arr_turbidity[i] = np.float32(self.arr_turbidity[next_changed_index])
+                            break
+
+                        next_changed_index= next_changed_index+1
+
 
 
     def calculate_center(self, max_lat, min_lat, max_lon, min_lon):
