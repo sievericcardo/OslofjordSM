@@ -13,8 +13,8 @@ class QueryAPI():
     def __init__(self):
         self.results = []
         self.locationlist = []
-        #self.hasura_url = "http://localhost:8080/v1/graphql"
-        self.hasura_url = "http://172.17.0.1:8080/v1/graphql"
+        self.hasura_url = "http://localhost:8080/v1/graphql"
+        #self.hasura_url = "http://172.17.0.1:8080/v1/graphql"
         
         self.headers = {
             "Content-Type": "application/json",
@@ -141,8 +141,8 @@ class QueryAPI():
                     
 
                     num_points = 100  # number of data points along lat and lon
-                    lon = np.linspace(sensor_lon - 0.1, sensor_lon + 0.1, num_points)
-                    lat = np.linspace(sensor_lat - 0.1, sensor_lat + 0.1, num_points)
+                    lon = np.linspace(sensor_lon - 0.005, sensor_lon + 0.005, num_points)
+                    lat = np.linspace(sensor_lat - 0.005, sensor_lat + 0.005, num_points)
 
                     min_datetime = min(salinity_hourly_avg.keys())
                     start_date_time = datetime.datetime.fromisoformat(min_datetime.replace('T', ' ').replace('+00:00', '')).strftime('%Y-%m-%d %H:%M:%S')
