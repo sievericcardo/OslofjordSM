@@ -8,6 +8,8 @@ import json
 import netCDF4 as nc
 import os
 
+# The url must be taken from the API_HOST of docker if present, localhost if not.
+base_url = 'http://' + os.getenv('API_HOST', 'localhost')
 
 class QueryAPI():
 
@@ -172,14 +174,31 @@ class QueryAPI():
                 turbidity_data = response.json()["data"]["turbidity"]
 
                 if salinity_data and turbidity_data:
-                    print("Response successful")
+                    print("===============================================")
+                    print("Data pulled from API")
+                    print(graphql_data)
+                    print(turbidity_data)
+                    print("===============================================\n\n")
 
+                if graphql_data and turbidity_data:
+                    print("Response successful")
+                    print(f"Salinity data: {len(graphql_data)}")
+                    print(f"Turbidity data: {len(turbidity_data)}")
+                    print("===============================================\n\n")
+
+                ds = None
                 count = 0
 
                 for location in self.locationlist:
                     count+=1
                     filtered_salinity_data = [data for data in salinity_data if data["location"]["coordinates"] == location]
                     filtered_turbidity_data = [data for data in turbidity_data if data["location"]["coordinates"] == location]
+
+                    print("===============================================")
+                    print("Filtered data")
+                    print(filtered_salinity_data)
+                    print(filtered_turbidity_data)
+                    print("===============================================\n\n")
 
                     # Calculate hourly average for salinity and turbidity
                     salinity_hourly_avg = self.calculate_hourly_average(filtered_salinity_data, "salinity")
@@ -196,6 +215,14 @@ class QueryAPI():
 
                     if (len(salinity_hourly_avg) != len(turbidity_hourly_avg)):
                         print(f"Data mismatch: Salinity: {len(salinity_hourly_avg)} Turbidity: {len(turbidity_hourly_avg)}")
+                        # If one of the two has length 0, skip the location
+                        if len(salinity_hourly_avg) == 0 or len(turbidity_hourly_avg) == 0:
+                            continue
+                        # Make the length equals
+                        if len(salinity_hourly_avg) > len(turbidity_hourly_avg):
+                            salinity_hourly_avg = {k: v for k, v in salinity_hourly_avg.items() if k in list(turbidity_hourly_avg.keys())}
+                        else:
+                            turbidity_hourly_avg = {k: v for k, v in turbidity_hourly_avg.items() if k in list(salinity_hourly_avg.keys())}
 
                     # create joined start date and end date => time frame
                     # create access data 
@@ -260,22 +287,32 @@ class QueryAPI():
                             coords={"lon": lon, "lat": lat, "depth": depth, "time": time},
                         )
 
-                ds.attrs['Conventions'] = 'CF-1.6'
-                ds.attrs['standard_name_vocabulary'] = 'CF-1.6'
+                # Check if ds is not None before using it
+                if ds is not None:
+                    ds.attrs['Conventions'] = 'CF-1.6'
+                    ds.attrs['standard_name_vocabulary'] = 'CF-1.6'
 
-                # Add the standard_name attribute to the salinity variable: improtant to get environment variable
-                ds.sea_water_salinity.attrs['standard_name'] = 'salinity'
-                ds.sea_water_temperature.attrs['standard_name'] = 'temperature'
-                ds.sea_water_turbidity.attrs['standard_name'] = 'turbidity'
+                    # Add the standard_name attribute to the salinity variable: improtant to get environment variable
+                    ds.sea_water_salinity.attrs['standard_name'] = 'salinity'
+                    ds.sea_water_temperature.attrs['standard_name'] = 'temperature'
+                    ds.sea_water_turbidity.attrs['standard_name'] = 'turbidity'
 
-                # Save the data to a NetCDF file
-                ds.to_netcdf("sensor_data.nc")
+                    print("===============================================")
+                    print("Dataset created successfully")
+                    print(ds)
+                    print("===============================================\n\n")
 
-                # Open the saved NetCDF file as a reader and check the variable attributes
-                reader_salinity = reader_netCDF_CF_generic.Reader('sensor_data.nc')
-                
-                print("Creation of netCDF file successful with variables: " + str(reader_salinity.variables))
-                print("===============================================\n\n")
+                    # Save the data to a NetCDF file
+                    ds.to_netcdf("sensor_data.nc")
+
+                    # Open the saved NetCDF file as a reader and check the variable attributes
+                    reader_salinity = reader_netCDF_CF_generic.Reader('sensor_data.nc')
+                    
+                    print("Creation of netCDF file successful with variables: " + str(reader_salinity.variables))
+                    print("===============================================\n\n")
+                else:
+                    print("No data to save")
+                    exit()
 
 
             else:
