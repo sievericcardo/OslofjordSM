@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta 
 from opendrift.readers import reader_netCDF_CF_generic
+from opendrift.readers.reader_ROMS_native import Reader
 from HydroDrift import HydroDrift
 from API import QueryAPI
 import json
@@ -60,7 +61,7 @@ if __name__ == "__main__":
         latSensorList.append(location[1])
         lonSensorList.append(location[0])
     
-
+    print(locations)
     
 
     #queryAPI.query_data_API(start_time, end_time+ timedelta(hours=1))
@@ -88,8 +89,8 @@ if __name__ == "__main__":
 
 
 
-    # drift does not have the attribute "readers"
-    # print(drift.readers)
+    
+    print(drift)
     print("===============================================\n\n")
     
     # Run the model
@@ -128,6 +129,7 @@ if __name__ == "__main__":
                 # Convert the dictionary to a JSON string
                 json_data = json.dumps(record_data)
                 queryAPI.data_for_mutation(json_data)
+                # print(json_data)
 
     
     queryAPI.reset_data_API()
@@ -141,8 +143,8 @@ if __name__ == "__main__":
 
 
     # CSV and Simulation
-    #drift.write_landers_to_csv()
-    #drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
+    # drift.write_landers_to_csv()
+    # drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
     print("===============================================\n\n")
     
