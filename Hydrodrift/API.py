@@ -173,12 +173,11 @@ class QueryAPI():
                 salinity_data = response.json()["data"]["salinity"]
                 turbidity_data = response.json()["data"]["turbidity"]
 
-                if salinity_data and turbidity_data:
-                    print("===============================================")
-                    print("Data pulled from API")
-                    print(graphql_data)
-                    print(turbidity_data)
-                    print("===============================================\n\n")
+                print("===============================================")
+                print("Data pulled from API")
+                print(f'Salinity: {len(graphql_data)}')
+                print(f'Turbidity: {len(turbidity_data)}')
+                print("===============================================\n\n")
 
                 if graphql_data and turbidity_data:
                     print("Response successful")
@@ -196,13 +195,19 @@ class QueryAPI():
 
                     print("===============================================")
                     print("Filtered data")
-                    print(filtered_salinity_data)
-                    print(filtered_turbidity_data)
+                    print(f'Salinity: {len(filtered_salinity_data)}')
+                    print(f'Turbidity: {len(filtered_turbidity_data)}')
                     print("===============================================\n\n")
 
                     # Calculate hourly average for salinity and turbidity
                     salinity_hourly_avg = self.calculate_hourly_average(filtered_salinity_data, "salinity")
-                    turbidity_hourly_avg = self.calculate_hourly_average(filtered_turbidity_data, "turbidity")  
+                    turbidity_hourly_avg = self.calculate_hourly_average(filtered_turbidity_data, "turbidity")
+
+                    print("===============================================")
+                    print("Hourly average")
+                    print(f'Salinity: {len(salinity_hourly_avg)}')
+                    print(f'Turbidity: {len(turbidity_hourly_avg)}')
+                    print("===============================================\n\n")
     
                     # length = len(salinity_hourly_avg)
                     print(f"salinity length: {len(salinity_hourly_avg)}, turbidity length: {len(turbidity_hourly_avg)}")
