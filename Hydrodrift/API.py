@@ -6,16 +6,17 @@ import datetime
 import pandas as pd
 import json
 import netCDF4 as nc
+import os
 
 
 class QueryAPI():
-     
+
     def __init__(self):
         self.results = []
         self.locationlist = []
-        self.hasura_url = "http://localhost:8080/v1/graphql"
-        #self.hasura_url = "http://172.17.0.1:8080/v1/graphql"
-        
+        hasura_host = os.getenv('HASURA_HOST', 'localhost')
+        self.hasura_url = f"http://{hasura_host}:8080/v1/graphql"
+
         self.headers = {
             "Content-Type": "application/json",
             "x-hasura-admin-secret": "mylongsecretkey",
