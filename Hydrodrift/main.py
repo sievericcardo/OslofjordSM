@@ -12,7 +12,6 @@ if __name__ == "__main__":
     1: Year
     2: Month
     3: Day
-    4: Hour
     
     '''
 
@@ -40,10 +39,10 @@ if __name__ == "__main__":
         #    print(arg)
 
 
-        if arg_len > 4:
-            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + (timedelta(hours=int(sys.argv[4])))
-        else:
-            end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
+        # if arg_len > 4:
+        #     end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3])) + (timedelta(hours=int(sys.argv[4])))
+        # else:
+        end_time = datetime(int(sys.argv[1]), int(sys.argv[2]), int(sys.argv[3]))
             
         start_time = end_time - timedelta(hours=seed_length)
 

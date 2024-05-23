@@ -64,6 +64,71 @@ class QueryAPI():
             exit()
 
 
+    def get_next_measurement_index(self, available_dates : list, hour_range : list) -> int :
+        """The method returns the hour index for which measurement are available. The return entry is based on the order of the given range.
+
+        Args:
+            available_dates (list): List of dates for which measurements are available
+            hour_range (list): List of hour index that should be check, the order of elements defines the priority
+
+        Returns:
+            int : index of the next available data entry
+        """
+        available_hours = [datetime.datetime.fromisoformat(date.replace('T', ' ')).hour for date in available_dates]
+        for i in hour_range:
+            if i in available_hours:
+                return i
+        return None
+    
+    def add_missing_measurements(self, measurements : dict, measurement_type : str, start_from : datetime.date):
+        """if measurements for the last 24 hours are missing, we add the missing measurement based on the average of the two closet values 
+
+        Args:
+            measurements (dict): dictionary with all provided measurements
+            measurement_type (str): name of the measurement: salinity or turbidity
+            start_from (date): date that indicates the first entry
+        """
+        available_hours = list(measurements.keys())
+        
+        for hour in range(24):
+            date_hour =  start_from + datetime.timedelta(hours=hour)
+            date_hour_str = date_hour.strftime('%Y-%m-%dT%H:%M:%S+00:00')
+            # print(date_hour_str)
+            if not (date_hour_str in available_hours):
+                print(date_hour_str)
+                prev_hours = range(hour - 1, -1, -1)
+                prev_hour = self.get_next_measurement_index(available_hours, prev_hours)
+                prev_measurement = None
+                if prev_hour:
+                    prev_date_hour =  start_from + datetime.timedelta(hours=prev_hour)
+                    prev_date_hour_str = prev_date_hour.strftime('%Y-%m-%dT%H:%M:%S+00:00')
+                    prev_measurement = measurements[prev_date_hour_str]
+                
+                next_hours = range(hour + 1, 24)
+                next_hour = self.get_next_measurement_index(available_hours, next_hours)
+                next_measurement = None
+                if next_hour:
+                    next_date_hour =  start_from + datetime.timedelta(hours=next_hour)
+                    next_date_hour_str = next_date_hour.strftime('%Y-%m-%dT%H:%M:%S+00:00')
+                    next_measurement = measurements[next_date_hour_str]
+
+                if measurement_type == "salinity":
+                    if prev_measurement and next_measurement:
+                        measurements[date_hour_str] = {"conductivity": (prev_measurement["conductivity"] + next_measurement["conductivity"]) / 2.0, "temperature": (prev_measurement["temperature"] + next_measurement["temperature"]) / 2.0}
+                    elif prev_measurement and next_measurement == None:
+                        measurements[date_hour_str] = {"conductivity": prev_measurement["conductivity"], "temperature": prev_measurement["temperature"]}
+                    elif next_measurement and prev_measurement == None:
+                        measurements[date_hour_str] = {"conductivity": next_measurement["conductivity"], "temperature": prev_measurement["temperature"]}
+                elif measurement_type == "turbidity":
+                    if prev_measurement and next_measurement:
+                        measurements[date_hour_str] = {"turbidity": (prev_measurement["turbidity"] + next_measurement["turbidity"]) / 2.0}
+                    elif prev_measurement and next_measurement == None:
+                        measurements[date_hour_str] = {"turbidity": prev_measurement["turbidity"]}
+                    elif next_measurement and prev_measurement == None:
+                        measurements[date_hour_str] = {"turbidity": next_measurement["turbidity"]}
+        return measurements
+                
+
     def query_data_API(self, start_datetime, end_datetime):
         """
         Pulls sensordata from the API and creates a netCDF file with hourly values
@@ -99,8 +164,6 @@ class QueryAPI():
         }}
         """
 
-        
-
         try:
             response = requests.post(self.hasura_url, json={"query": graphql_query}, headers=self.headers)
 
@@ -124,9 +187,15 @@ class QueryAPI():
     
                     # length = len(salinity_hourly_avg)
                     print(f"salinity length: {len(salinity_hourly_avg)}, turbidity length: {len(turbidity_hourly_avg)}")
+                    
+                    if (len(salinity_hourly_avg) < 24):
+                        salinity_hourly_avg = self.add_missing_measurements(salinity_hourly_avg, "salinity", start_from)
+
+                    if (len(turbidity_hourly_avg) < 24):
+                        turbidity_hourly_avg = self.add_missing_measurements(turbidity_hourly_avg, "turbidity", start_from)
+
                     if (len(salinity_hourly_avg) != len(turbidity_hourly_avg)):
                         print(f"Data mismatch: Salinity: {len(salinity_hourly_avg)} Turbidity: {len(turbidity_hourly_avg)}")
-
 
                     # create joined start date and end date => time frame
                     # create access data 
