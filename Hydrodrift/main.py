@@ -123,6 +123,7 @@ if __name__ == "__main__":
                     "temperature": f"{lander.arr_temperature[ind]}",
                     "turbidity": f"{lander.arr_turbidity[ind]}",
                     "grid_id": f"{lander.id}",
+                    "changed": f"{lander.arr_change}"
                 }
 
                 # Convert the dictionary to a JSON string
