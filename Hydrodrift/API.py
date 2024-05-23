@@ -39,7 +39,7 @@ class QueryAPI():
 
         unique_location_query = f"""
         query APIQuery {{
-            salinity(where: {{record_time: {{_gte: "{date_from_str}", _lte: "{date_to_str}"}}}}, distinct_on: location) {{
+            salinity(where: {{record_time: {{_gte: "{date_from_str}", _lt: "{date_to_str}"}}}}, distinct_on: location) {{
                 location
             }}
         }}
@@ -74,7 +74,7 @@ class QueryAPI():
         # Set the start and end dates
         start_from = start_datetime
         end_to = end_datetime
-        end_to_turbidity = end_to + datetime.timedelta(hours=1)
+        end_to_turbidity = end_to
 
 
         # Format the dates as strings
@@ -85,13 +85,13 @@ class QueryAPI():
         # Your GraphQL query with variables and formatted dates
         graphql_query = f"""
         query APIQuery {{
-            salinity(where: {{record_time: {{_gte: "{date_from_str}", _lte: "{date_to_str_salinity}"}}}}) {{
+            salinity(where: {{record_time: {{_gte: "{date_from_str}", _lt: "{date_to_str_salinity}"}}}}) {{
                 temperature
                 conductivity
                 location
                 record_time
             }}
-            turbidity(where: {{record_time: {{_gte: "{date_from_str}", _lte: "{date_to_str_turbidity}"}}}}) {{
+            turbidity(where: {{record_time: {{_gte: "{date_from_str}", _lt: "{date_to_str_turbidity}"}}}}) {{
                 record_time
                 turbidity
                 location
@@ -105,30 +105,31 @@ class QueryAPI():
             response = requests.post(self.hasura_url, json={"query": graphql_query}, headers=self.headers)
 
             if response.status_code == 200:
-                graphql_data = response.json()["data"]["salinity"]
+                salinity_data = response.json()["data"]["salinity"]
                 turbidity_data = response.json()["data"]["turbidity"]
 
-                if graphql_data and turbidity_data:
+                if salinity_data and turbidity_data:
                     print("Response successful")
 
                 count = 0
 
                 for location in self.locationlist:
                     count+=1
-                    filtered_salinity_data = [data for data in graphql_data if data["location"]["coordinates"] == location]
+                    filtered_salinity_data = [data for data in salinity_data if data["location"]["coordinates"] == location]
                     filtered_turbidity_data = [data for data in turbidity_data if data["location"]["coordinates"] == location]
 
                     # Calculate hourly average for salinity and turbidity
                     salinity_hourly_avg = self.calculate_hourly_average(filtered_salinity_data, "salinity")
-                    turbidity_hourly_avg = self.calculate_hourly_average(filtered_turbidity_data, "turbidity")
+                    turbidity_hourly_avg = self.calculate_hourly_average(filtered_turbidity_data, "turbidity")  
     
-
+                    # length = len(salinity_hourly_avg)
+                    print(f"salinity length: {len(salinity_hourly_avg)}, turbidity length: {len(turbidity_hourly_avg)}")
                     if (len(salinity_hourly_avg) != len(turbidity_hourly_avg)):
                         print(f"Data mismatch: Salinity: {len(salinity_hourly_avg)} Turbidity: {len(turbidity_hourly_avg)}")
 
-                    # Convert time strings to datetime objects
-                    time = [datetime.datetime.fromisoformat(time_str) for time_str in salinity_hourly_avg.keys()]
-                    
+
+                    # create joined start date and end date => time frame
+                    # create access data 
 
                     # Extract relevant data from GraphQL response
                     depth = np.linspace(0, 100, 10, dtype=np.float64)
@@ -163,9 +164,12 @@ class QueryAPI():
                     sea_water_temperature = np.zeros((len(time), len(depth), len(lat), len(lon)))
                     sea_water_turbidity = np.zeros((len(time), len(depth), len(lat), len(lon)))
 
+
                     for i, key in enumerate(salinity_hourly_avg.keys()):
                         sea_water_salinity[i, :, :, :] = sea_water_salinity_data[i]
                         sea_water_temperature[i, :, :, :] = sea_water_temperature_data[i]
+
+                    
 
                     for i, key in enumerate(turbidity_hourly_avg.keys()):
                         sea_water_turbidity[i, :, :, :] = sea_water_turbidity_data[i]

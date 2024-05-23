@@ -90,8 +90,8 @@ if __name__ == "__main__":
 
 
 
-    
-    print(drift.readers)
+    # drift does not have the attribute "readers"
+    # print(drift.readers)
     print("===============================================\n\n")
     
     # Run the model
