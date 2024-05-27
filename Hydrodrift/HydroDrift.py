@@ -147,7 +147,7 @@ class HydroDrift(OceanDrift):
 
     def update_turbidity(self):
         '''
-        Temperature update method for the particle using the environment data
+        Turbidity update method for the particle using the environment data
         '''
         #print(self.environment.sea_water_turbidity)
         try:
@@ -155,48 +155,6 @@ class HydroDrift(OceanDrift):
         except AttributeError:
             print("Turbidity data not found in environment.")
 
-
-    # ---------------------------------------------------
-
-    def calculate_salinity_diffusion(self):
-        '''
-        Method to calculate diffusion of the salinity
-        ''' 
-        self.count+= 1
-
-        if self.count == 1:
-            return self.environment.salinity
-        
-        else: 
-            diff = self.environment.salinity - self.environment.sea_water_salinity
-            result = self.environment.salinity - diff/2
-            return result
-        
-
-    def calculate_temperature_diffusion(self):
-        '''
-        Method to calculate diffusion of the temperature
-        ''' 
-
-        if self.count == 1:
-            return self.environment.temperature
-        
-        else: 
-            diff = self.environment.temperature - self.environment.sea_water_temperature
-            result = self.environment.temperature- diff/2
-            return result
-
-    def calculate_turbidity_diffusion(self):
-        '''
-        Method to calculate diffusion of the turbidity
-        ''' 
-
-        # Predefined or calculated value for diffusion
-        diffusion = 0.001
-
-
-    # ---------------------------------------------------
-        
 
 
     
