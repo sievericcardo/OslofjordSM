@@ -6,6 +6,7 @@
 __pycache__/
 *.py[cod]
 *$py.class
+HydroDrift/__pycache__/
 
 # C extensions
 *.so
