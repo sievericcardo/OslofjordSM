@@ -208,6 +208,12 @@ class QueryAPI():
                     print(f'Salinity: {len(salinity_hourly_avg)}')
                     print(f'Turbidity: {len(turbidity_hourly_avg)}')
                     print("===============================================\n\n")
+
+                    print("===============================================")
+                    print("Hourly average")
+                    print(f'Salinity: {salinity_hourly_avg}')
+                    print(f'Turbidity: {turbidity_hourly_avg}')
+                    print("===============================================\n\n")
     
                     # length = len(salinity_hourly_avg)
                     print(f"salinity length: {len(salinity_hourly_avg)}, turbidity length: {len(turbidity_hourly_avg)}")
