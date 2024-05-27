@@ -152,14 +152,14 @@ if __name__ == "__main__":
     print("===============================================\n\n")
 
 
-    queryAPI.mutation_data_API()
+    # queryAPI.mutation_data_API()
     print("POST data complete")
     print("===============================================\n\n")
 
 
     # CSV and Simulation
-    # drift.write_landers_to_csv()
-    # drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
+    drift.write_landers_to_csv()
+    drift.animation(fast=True, filename='hydrodrift_visual_simulation.mp4')
     print("Simulation complete")
     print("===============================================\n\n")
     
