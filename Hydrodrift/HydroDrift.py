@@ -131,6 +131,7 @@ class HydroDrift(OceanDrift):
         try:
             print(self.environment.salinity)
             self.elements.salinity = self.environment.salinity
+            print(f'Updating salinity to {self.environment.salinity}')
         except AttributeError:
             print("Salinity data not found in environment.")
 
