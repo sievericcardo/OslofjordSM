@@ -130,7 +130,6 @@ class VirtualLander():
             lat
             lon
         '''
-
         if not (self.minlat <= lat <= self.maxlat and self.minlon <= lon <= self.maxlon):
             return False
         else:

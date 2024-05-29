@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta 
-from opendrift.readers import reader_netCDF_CF_generic
+from opendrift.readers import reader_netCDF_CF_generic, reader_ROMS_native
 from HydroDrift import HydroDrift
 from API import QueryAPI
 import json
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # Seed length in hours
     seed_length = 24
     # Start and end datetime
-    end_time = datetime(2024, 4, 10, 0)
+    end_time = datetime(2024, 4, 16, 0)
     start_time = end_time - timedelta(hours=seed_length)
 
 
@@ -60,8 +60,10 @@ if __name__ == "__main__":
         latSensorList.append(location[1])
         lonSensorList.append(location[0])
     
-
-    
+    # add additional lander
+    # latSensorList.append(latSensorList[0] + 0.15)
+    # lonSensorList.append(lonSensorList[0] - 0.1)
+    # print(locations)
 
     #queryAPI.query_data_API(start_time, end_time+ timedelta(hours=1))
 
@@ -75,28 +77,36 @@ if __name__ == "__main__":
     drift.create_landers_from_list(start_time,seed_length, size_lat, size_lon)
     
 
-
     # Load API data from NetCDF file 
     filename = 'sensor_data.nc'
-    salinity_reader = reader_netCDF_CF_generic.Reader(filename)
+    lander_reader = reader_netCDF_CF_generic.Reader(filename)
     #print('Variables in the NetCDF file:', salinity_reader.variables)
+
+    reader_norkyst = reader_netCDF_CF_generic.Reader(
+    'https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be')
    
-    drift.add_reader(salinity_reader)
-    drift.add_readers_from_list(
-    ['https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be'])
-
-
-
+    # drift.add_reader(salinity_reader)
+    fjordOSReader = reader_ROMS_native.Reader("https://thredds.met.no/thredds/dodsC/fjordos/operational_archive/complete_archive/ocean_his.nc_2024041500")
+    # norkyst800Reader = reader_netCDF_CF_generic.Reader("https://thredds.met.no/thredds/dodsC/sea/norkyst800m/1h/aggregate_be")
+    metrological_model = fjordOSReader
+    drift.add_reader(metrological_model)
+    drift.add_reader(lander_reader, first=True)
 
     # drift does not have the attribute "readers"
-    # print(drift.readers)
+    print(metrological_model)
+
     print("===============================================\n\n")
+
+
     
     # Run the model
     number = 1
     for i in range(len(latSensorList)):
-        drift.seed_elements(lon=lonSensorList[i], lat=latSensorList[i], time=[start_time, end_time],
+        drift.seed_elements(lon=lonSensorList[
+             i], lat=latSensorList[i], time=[start_time, end_time],
                         number=500, radius=20)
+        
+    # drift.plot(buffer=.7, fast=True)
 
     seed_times = drift.elements_scheduled_time[0:number] 
 
@@ -107,6 +117,7 @@ if __name__ == "__main__":
     print("Model run complete")
     print("===============================================\n\n")
 
+    # drift.plot(buffer=.7, fast=True)
 
     # Post prep of data  
     drift.smooth_landerlist()

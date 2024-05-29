@@ -129,6 +129,7 @@ class HydroDrift(OceanDrift):
         #if self.environment.salinity == 34:
 
         try:
+            print(self.environment.salinity)
             self.elements.salinity = self.environment.salinity
         except AttributeError:
             print("Salinity data not found in environment.")
@@ -162,6 +163,7 @@ class HydroDrift(OceanDrift):
         '''
         Method to update the particles during simulation
         ''' 
+        print("update method")
         # Simply move particles with ambient current
         self.advect_ocean_current()
 
@@ -450,7 +452,6 @@ class HydroDrift(OceanDrift):
         Method to cupdate lander values
         '''
         current_sim_time = self.time
-          
         for i in range(len(self.elements.ID)):
             for lander in self.lander_list:
                 if (lander.contains(self.elements.lat[i], self.elements.lon[i])):
