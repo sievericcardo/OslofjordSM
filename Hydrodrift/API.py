@@ -7,6 +7,7 @@ import pandas as pd
 import json
 import netCDF4 as nc
 import os
+import traceback
 
 # The url must be taken from the API_HOST of docker if present, localhost if not.
 base_url = 'http://' + os.getenv('API_HOST', 'localhost')
@@ -105,6 +106,7 @@ class QueryAPI():
                     prev_date_hour =  start_from + datetime.timedelta(hours=prev_hour)
                     prev_date_hour_str = prev_date_hour.strftime('%Y-%m-%dT%H:%M:%S+00:00')
                     prev_measurement = measurements[prev_date_hour_str]
+                    print(prev_measurement)
                 
                 next_hours = range(hour + 1, 24)
                 next_hour = self.get_next_measurement_index(available_hours, next_hours)
@@ -113,6 +115,7 @@ class QueryAPI():
                     next_date_hour =  start_from + datetime.timedelta(hours=next_hour)
                     next_date_hour_str = next_date_hour.strftime('%Y-%m-%dT%H:%M:%S+00:00')
                     next_measurement = measurements[next_date_hour_str]
+                    print(next_measurement)
 
                 if measurement_type == "salinity":
                     if prev_measurement and next_measurement:
@@ -175,13 +178,13 @@ class QueryAPI():
 
                 print("===============================================")
                 print("Data pulled from API")
-                print(f'Salinity: {len(graphql_data)}')
+                print(f'Salinity: {len(salinity_data)}')
                 print(f'Turbidity: {len(turbidity_data)}')
                 print("===============================================\n\n")
 
-                if graphql_data and turbidity_data:
+                if salinity_data and turbidity_data:
                     print("Response successful")
-                    print(f"Salinity data: {len(graphql_data)}")
+                    print(f"Salinity data: {len(salinity_data)}")
                     print(f"Turbidity data: {len(turbidity_data)}")
                     print("===============================================\n\n")
 
@@ -226,14 +229,14 @@ class QueryAPI():
 
                     if (len(salinity_hourly_avg) != len(turbidity_hourly_avg)):
                         print(f"Data mismatch: Salinity: {len(salinity_hourly_avg)} Turbidity: {len(turbidity_hourly_avg)}")
-                        # If one of the two has length 0, skip the location
-                        if len(salinity_hourly_avg) == 0 or len(turbidity_hourly_avg) == 0:
-                            continue
                         # Make the length equals
                         if len(salinity_hourly_avg) > len(turbidity_hourly_avg):
                             salinity_hourly_avg = {k: v for k, v in salinity_hourly_avg.items() if k in list(turbidity_hourly_avg.keys())}
                         else:
                             turbidity_hourly_avg = {k: v for k, v in turbidity_hourly_avg.items() if k in list(salinity_hourly_avg.keys())}
+                    # If one of the two has length 0, skip the location
+                    if len(salinity_hourly_avg) <= 1 or len(turbidity_hourly_avg) <= 1:
+                        continue
 
                     # create joined start date and end date => time frame
                     # create access data 
@@ -335,7 +338,7 @@ class QueryAPI():
             print("Error: Unable to connect to the Hasura API. Please check the server.")
             exit()
         except Exception as e:
-            print(f"An error occurred: {e}")
+            print(f"An error occurred: {traceback.format_exc()}")
             exit()
             
         
