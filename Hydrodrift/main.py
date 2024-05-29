@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta 
 from opendrift.readers import reader_netCDF_CF_generic
-from opendrift.readers.reader_ROMS_native import Reader
+from opendrift.readers import reader_ROMS_native
 from HydroDrift import HydroDrift
 from API import QueryAPI
 import json
