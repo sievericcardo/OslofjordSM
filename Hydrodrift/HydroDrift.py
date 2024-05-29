@@ -109,8 +109,6 @@ class HydroDrift(OceanDrift):
         
 
     }
-
-
  
 
     def print_environment_variables(self) :
@@ -129,8 +127,8 @@ class HydroDrift(OceanDrift):
         #if self.environment.salinity == 34:
 
         try:
-            self.elements.salinity = self.environment.salinity
-            print(f'Updating salinity to {self.environment.salinity}')
+            print(f'Updating salinity')
+            self.elements.salinity = self.environment.sea_water_salinity
         except AttributeError:
             print("Salinity data not found in environment.")
 
@@ -142,7 +140,7 @@ class HydroDrift(OceanDrift):
         #if self.environment.temperature == 10:
             
         try:
-            self.elements.temperature = self.environment.temperature
+            self.elements.temperature = self.environment.sea_water_temperature
         except AttributeError:
             print("Temperature data not found in environment.")
 
